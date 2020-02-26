@@ -3,8 +3,6 @@ os: osx
 osx_image: xcode10.2
 language: node_js
 node_js: "10"
-cache:
-  npm: false
 env:
   global:
     - PLATFORM_VERSION=12.2
@@ -16,6 +14,17 @@ env:
     - secure: ls4nb5gcu0USHauJOkB9R5p86PMPJd/wCIQWjj/bhAfLNpSNNthtss2Ss9M7BjJg8lth8c85MrGfkAZOGgXknNtlQ2HHwKK4fbEiLAKLDS9diac6/OpAsxxE1/OvletYhkKLQSqb8d5Ju3S/xY6SmNDIzHUpeTYV2/5Ve+7Fh9zc1RztxsPwV1vxPtL6w0IAzNS9PQOmDXQ6x9KuZModtR7ohVKD47A91MzBlu3kk1CSaeQ4I8l7eXi4R9J6F81jkr51Vzoam4B6+4HTepSdfo02irBQWzaJ3VtRCbazFRBc/wfe4YgOPQTD9k69FiP19sa28lP9eSn6h5OCSXA9M803kju33Ml6OItRWDG0gUG1dzTroVXELEIcfnw1iTsFqKWoJLaEzEiXV8n2RsXLaLC5SHPgKwGEigGMfWDxM9leIC8hgervjQvApmx7btzq9S50tMcrzba5qwXDDrjJi1wKSjd4pQajhSj9VgOH9D5ihZBdn++VLwEvfAd4yQhjdsr9+COV1HrgK7Ro1HAHWgGnPtwBKiQdVU20QdQzNrhRdF2MLrJ4BfWpNm92JwlPxP/ojuA2l8mr9nDqlfBgXlnG32j59988gi85vaMfXssrUXtdJqsKJckI01c/mgaRh9pvG3UPX8K39quKBI5ftS8aCCa8tbF6bLq/ZuI2TRU=
 jobs:
   include:
+    - stage: precache
+      cache:
+        npm: true
+      if: &noncron type != cron
+      before_install:
+        # remove the cached dependencies
+        - rm -rf node_modules
+      script: true
+      after_script: true
+      after_success: true
+
     - stage: tests
       name: Unit tests
       if: &noncron type != cron
@@ -192,9 +201,7 @@ install:
       npm install --no-save mjpeg-consumer;
 
       pushd node_modules/appium-webdriveragent;
-      carthage bootstrap --no-use-binaries;
-      cp Cartfile.resolved Carthage;
-      mkdir -p ./Resources/WebDriverAgent.bundle;
+      ./Scripts/bootstrap.sh -dn;
       popd;
     else
       npm install --production;
