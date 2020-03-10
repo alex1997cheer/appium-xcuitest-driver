@@ -5,7 +5,7 @@ import { initSession, deleteSession, MOCHA_TIMEOUT } from '../helpers/session';
 import { SAFARI_CAPS } from '../desired';
 import {
   openPage, spinTitleEquals, spinTitle, GUINEA_PIG_PAGE,
-  GUINEA_PIG_SCROLLABLE_PAGE, GUINEA_PIG_APP_BANNER_PAGE
+  GUINEA_PIG_SCROLLABLE_PAGE, GUINEA_PIG_APP_BANNER_PAGE, GUINEA_PIG_SHADOW_PAGE
 } from './helpers';
 import { killAllSimulators } from '../helpers/simulator';
 import { retryInterval } from 'asyncbox';
@@ -151,6 +151,22 @@ describe('Safari - coordinate conversion -', function () {
           await driver.elementById('alert1').click();
           await driver.acceptAlert();
           await driver.title().should.eventually.include('I am a page title');
+        });
+
+        it('should interact with an element in the shadow DOM', async function () {
+          await loadPage(driver, GUINEA_PIG_SHADOW_PAGE);
+
+          const form = await driver.execute(`return document.querySelector('appium-form');`);
+          const btn = await driver.execute(`return arguments[0].shadowRoot.querySelector('#shadowButton');`, [form]);
+          await btn.click();
+
+          // make sure the alert has time to come up
+          await retryInterval(5, 500, async () => await driver.alertText())
+            .should.eventually.include('Inner target: BUTTON');
+          await driver.acceptAlert();
+
+          (await driver.alertText()).should.include('Outer target: APPIUM-FORM');
+          await driver.acceptAlert();
         });
 
         describe('with tabs -', function () {

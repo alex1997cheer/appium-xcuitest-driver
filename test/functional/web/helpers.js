@@ -13,6 +13,7 @@ const GUINEA_PIG_SCROLLABLE_PAGE = `${GUINEA_PIG_PAGE}-scrollable`;
 const GUINEA_PIG_APP_BANNER_PAGE = `${GUINEA_PIG_PAGE}-app-banner`;
 const GUINEA_PIG_FRAME_PAGE = `${TEST_END_POINT}/frameset.html`;
 const GUINEA_PIG_IFRAME_PAGE = `${TEST_END_POINT}/iframes.html`;
+const GUINEA_PIG_SHADOW_PAGE = `${TEST_END_POINT}/shadow-dom.html`;
 // if the phishing URL stops working for some reason, see
 // http://testsafebrowsing.appspot.com/ for alternatives
 const PHISHING_END_POINT = 'http://testsafebrowsing.appspot.com/s/phishing.html';
@@ -60,4 +61,5 @@ async function openPage (driver, url, tries = 10, interval = 500) {
 
 export { spinTitle, spinTitleEquals, spinWait, openPage, GUINEA_PIG_PAGE,
   GUINEA_PIG_FRAME_PAGE, GUINEA_PIG_IFRAME_PAGE, PHISHING_END_POINT,
-  APPIUM_IMAGE, GUINEA_PIG_SCROLLABLE_PAGE, GUINEA_PIG_APP_BANNER_PAGE };
+  APPIUM_IMAGE, GUINEA_PIG_SCROLLABLE_PAGE, GUINEA_PIG_APP_BANNER_PAGE,
+  GUINEA_PIG_SHADOW_PAGE };
