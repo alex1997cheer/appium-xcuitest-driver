@@ -43,7 +43,8 @@ describe('safari - execute -', function () {
 
     describe('synchronous', function () {
       it('should bubble up javascript errors', async function () {
-        await driver.execute(`'nan'--`).should.eventually.be.rejected;
+        await driver.execute(`'nan'--`)
+          .should.eventually.be.rejectedWith(/Postfix -- operator applied to value that is not a reference/);
       });
 
       it('should eval javascript', async function () {
