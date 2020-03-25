@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { retryInterval } from 'asyncbox';
 import { SAFARI_CAPS } from '../desired';
 import { initSession, deleteSession, MOCHA_TIMEOUT } from '../helpers/session';
 import { GUINEA_PIG_PAGE } from './helpers';
@@ -25,48 +24,52 @@ describe('safari - alerts', function () {
     await deleteSession();
   });
 
-  async function acceptAlert (driver) {
-    await retryInterval(5, 500, driver.acceptAlert.bind(driver));
-  }
-
-  async function dismissAlert (driver) {
-    await retryInterval(5, 500, driver.dismissAlert.bind(driver));
-  }
-
   it('should accept alert', async function () {
     await driver.elementById('alert1').click();
-    await acceptAlert(driver);
+    await driver.acceptAlert();
     (await driver.title()).should.include('I am a page title');
   });
 
   it('should dismiss alert', async function () {
     await driver.elementById('alert1').click();
-    await dismissAlert(driver);
+    await driver.dismissAlert();
     (await driver.title()).should.include('I am a page title');
   });
 
   it('should get text of alert', async function () {
     await driver.elementById('alert1').click();
     (await driver.alertText()).should.include('I am an alert');
-    await dismissAlert(driver);
+    await driver.dismissAlert();
   });
   it('should not get text of alert that closed', async function () {
     await driver.elementById('alert1').click();
-    await acceptAlert(driver);
+    await driver.acceptAlert();
     await driver.alertText()
       .should.eventually.be.rejectedWith(/An attempt was made to operate on a modal dialog when one was not open/);
   });
   it('should set text of prompt', async function () {
     await driver.elementById('prompt1').click();
     await driver.alertKeys('of course!');
-    await acceptAlert(driver);
+    await driver.acceptAlert();
 
-    const el = await driver.elementById('promptVal');
-    (await el.getAttribute('value')).should.eql('of course!');
+    (await driver.elementById('promptVal').getAttribute('value'))
+      .should.eql('of course!');
   });
   it('should fail to set text of alert', async function () {
     await driver.elementById('alert1').click();
     await driver.alertKeys('yes I do!')
-      .should.eventually.be.rejectedWith(/Tried to set text of an alert that was not a prompt/);
+      .should.eventually.be.rejectedWith(/The alert contains no input fields/);
+    await driver.acceptAlert();
+  });
+  it('should be able to get alert buttons', async function () {
+    await driver.elementById('alert1').click();
+    await driver.execute('mobile: alert', {action: 'getButtons'});
+    await driver.acceptAlert();
+  });
+  it('should fail to get buttons of alert that closed', async function () {
+    await driver.elementById('alert1').click();
+    await driver.acceptAlert();
+    await driver.execute('mobile: alert', {action: 'getButtons'})
+      .should.eventually.be.rejectedWith(/An attempt was made to operate on a modal dialog when one was not open/);
   });
 });
